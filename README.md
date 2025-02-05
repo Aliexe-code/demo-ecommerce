@@ -36,7 +36,6 @@ This is a NestJS application optimized for performance and scalability. It uses:
 - CRUD operations for users.
 - Logging with `nestjs-pino`.
 - Environment variable management with `@nestjs/config`.
-- Health check endpoint.
 
 ## Prerequisites
 - [Bun](https://bun.sh/) (v1.0.0 or higher)
