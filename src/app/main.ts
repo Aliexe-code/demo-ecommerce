@@ -7,6 +7,8 @@ import {
 import fastifyCompression from '@fastify/compress';
 import { Logger } from 'nestjs-pino';
 import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import fastifyHelmet from '@fastify/helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -14,29 +16,42 @@ async function bootstrap() {
     new FastifyAdapter({
       ignoreTrailingSlash: true,
       disableRequestLogging: true,
-      bodyLimit: 1048576 * 2,
     }),
     { bufferLogs: true },
   );
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+  await app.register(fastifyHelmet, {
+    contentSecurityPolicy: false,
+  });
 
-  // Compression
   await app.register(fastifyCompression, {
     encodings: ['gzip', 'deflate'],
     threshold: 1024,
   });
 
-  // CORS
   app.enableCors({
     origin: process.env.CORS_ORIGINS?.split(',') || '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
-  // Logger
   app.useLogger(app.get(Logger));
+  app.enableShutdownHooks();
 
-  // Start the app
+  const config = new DocumentBuilder()
+    .setTitle('Users API')
+    .setDescription('API documentation for the Users service')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
+
   await app.listen(process.env.PORT ?? 3000);
   app
     .get(Logger)
