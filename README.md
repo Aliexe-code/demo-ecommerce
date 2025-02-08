@@ -32,7 +32,8 @@
   </a>
 </p>
 
-<<<<<<< HEAD
+# This repository demonstrates a NestJS application built with [Bun](https://bun.sh/) and Prisma. It includes a **Users** feature that provides REST endpoints for creating, retrieving, updating, and deleting users, along with comprehensive unit and end-to-end tests.
+
 # Optimized NestJS App
 
 This is a NestJS application optimized for performance and scalability. It uses:
@@ -61,20 +62,11 @@ This is a NestJS application optimized for performance and scalability. It uses:
      cp .env.example .env
    bunx prisma migrate dev --name init
     bun run start:dev
-    
+  #for testing check package.json file
+    `bun run test`
+    `bun run test:e2e`
   
     
   
-  
-=======
----
 
-## Overview
 
-This repository demonstrates a NestJS application built with [Bun](https://bun.sh/) and Prisma. It includes a **Users** feature that provides REST endpoints for creating, retrieving, updating, and deleting users, along with comprehensive unit and end-to-end tests.
-
----`<p align="center">`
-`<a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" />``</a>`
-
-</p>
->>>>>>> 8049228 (adding-tests)
