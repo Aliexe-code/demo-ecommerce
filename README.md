@@ -63,9 +63,9 @@ This is a NestJS application optimized for performance and scalability. It uses:
    bunx prisma migrate dev --name init
     bun run start:dev
 2.For testing check package.json file
-    ```
-    `bun run test
-`    bun run test:e2e`
+
+    bun run test
+    bun run test:e2e
     ```
     
   
