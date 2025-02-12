@@ -66,7 +66,6 @@ This is a NestJS application optimized for performance and scalability. It uses:
 
     bun run test
     bun run test:e2e
-    ```
     
   
 
