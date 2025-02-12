@@ -62,10 +62,11 @@ This is a NestJS application optimized for performance and scalability. It uses:
      cp .env.example .env
    bunx prisma migrate dev --name init
     bun run start:dev
-  #for testing check package.json file
-    `bun run test`
-    `bun run test:e2e`
-  
+2.For testing check package.json file
+    ```
+    `bun run test
+`    bun run test:e2e`
+    ```
     
   
 
