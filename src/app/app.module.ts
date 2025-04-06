@@ -4,6 +4,8 @@ import { LoggerModule } from 'nestjs-pino';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from '../prisma/prisma.module';
 import { UsersModule } from 'src/users/users.module';
+import { APP_FILTER } from '@nestjs/core';
+import { AllExceptionsFilter } from 'src/common/http-exception.filter';
 
 @Module({
   imports: [
@@ -37,7 +39,7 @@ import { UsersModule } from 'src/users/users.module';
     }),
   ],
   controllers: [],
-  providers: [],
+  providers: [{ provide: APP_FILTER, useClass: AllExceptionsFilter }],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
