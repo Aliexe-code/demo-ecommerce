@@ -1,11 +1,7 @@
-import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
-import { ErrorHandlingMiddleware } from '../middleware/errorhandling.middleware';
-import { LoggerModule } from 'nestjs-pino';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from '../prisma/prisma.module';
 import { UsersModule } from 'src/users/users.module';
-import { APP_FILTER } from '@nestjs/core';
-import { AllExceptionsFilter } from 'src/common/http-exception.filter';
 
 @Module({
   imports: [
@@ -15,34 +11,8 @@ import { AllExceptionsFilter } from 'src/common/http-exception.filter';
       isGlobal: true,
       envFilePath: '.env',
     }),
-
-    LoggerModule.forRoot({
-      pinoHttp: {
-        autoLogging: false,
-        level: process.env.NODE_ENV === 'production' ? 'error' : 'info',
-        transport:
-          process.env.NODE_ENV !== 'production'
-            ? {
-                target: 'pino-pretty',
-                options: {
-                  colorize: true,
-                  translateTime: 'SYS:standard',
-                  ignore: 'pid,hostname,context',
-                  messageFormat:
-                    '{msg} [method={req.method} url={req.url} status={res.statusCode}]',
-                },
-              }
-            : undefined,
-        redact: ['req.headers.authorization'],
-        messageKey: 'message',
-      },
-    }),
   ],
   controllers: [],
-  providers: [{ provide: APP_FILTER, useClass: AllExceptionsFilter }],
+  providers: [],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(ErrorHandlingMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}
