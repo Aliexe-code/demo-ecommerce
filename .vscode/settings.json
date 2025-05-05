@@ -1,11 +1,23 @@
 {
-  "typescript.tsdk": "./node_modules/typescript/lib",
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
-  },
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.fontFamily": "'JetBrains Mono', monospace",
-  "editor.fontLigatures": true,
-  "editor.fontSize": 14
+  "prettier.requireConfig": true,
+  "prettier.configPath": ".prettierrc",
+  "prettier.useEditorConfig": true,
+  "json.validate.enable": false,
+  "sqltools.connections": [
+    {
+      "pgOptions": {
+        "ssl": {
+          "rejectUnauthorized": true
+        }
+      },
+      "previewLimit": 50,
+      "server": "localhost",
+      "driver": "PostgreSQL",
+      "connectString": "postgresql://neondb_owner:npg_XSNocW4jDvh2@ep-late-frost-a57pu1dn-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require",
+      "name": "nestjs"
+    }
+  ],
+  "postman.settings.dotenv-detection-notification-visibility": false
 }

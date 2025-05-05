@@ -4,6 +4,10 @@
   "sourceRoot": "src",
   "entryFile": "app/main",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "outputPath": "dist",
+    "watchAssets": true,
+    "plugins": ["@nestjs/swagger"],
+    "watch": true
   }
 }

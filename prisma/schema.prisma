@@ -7,9 +7,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserType {
+  ADMIN       @map("admin")
+  NORMAL_USER @map("normal_user")
+}
 model User {
-  id    String  @id @default(cuid())
-  email String  @unique
-  name  String
-  age   Int?
+  id       String @id @default(cuid())
+  email    String @unique
+  name     String
+  password String
+  age      Int?
+  userType  UserType @default(NORMAL_USER)
+  products Products[]
+   reviews   Review[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Products{
+  id String @id @default(cuid())
+  title       String
+  description String?
+  price       Float
+  userId      String
+  user        User @relation(fields: [userId], references: [id])
+  reviews     Review[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Review {
+  id        String    @id @default(uuid())
+  rating    Float
+  comment   String
+  productId String
+  userId    String
+  product   Products  @relation(fields: [productId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
 }

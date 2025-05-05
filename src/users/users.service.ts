@@ -1,61 +1,94 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { JWTPayloadType } from './entities/types';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserEntity } from './entities/user.entity';
+import { UserType } from '@prisma/client';
+import { AuthProvider } from './auth.provider';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private authProvider: AuthProvider,
+  ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
-    return this.prisma.user.create({
-      data: createUserDto,
-    });
+  public async register(registerDto: RegisterDto) {
+    return this.authProvider.register(registerDto);
   }
 
-  async findAll(): Promise<UserEntity[]> {
-    return this.prisma.user.findMany();
+  public async login(loginDto: LoginDto) {
+    return this.authProvider.login(loginDto);
   }
 
-  async findOne(id: string): Promise<UserEntity> {
+  public async getCurrentUser(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
     });
-
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-
-    return user;
+    if (!user) throw new NotFoundException('User not found');
+    return {
+      message: 'User found successfully',
+      userData: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        age: user.age,
+        userType: user.userType,
+      },
+    };
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserEntity> {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-    });
-
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-
-    return this.prisma.user.update({
-      where: { id },
-      data: updateUserDto,
-    });
+  public async getAllUsers() {
+    const users = await this.prisma.user.findMany();
+    if (!users) throw new NotFoundException('Users not found');
+    return {
+      message: 'Users found successfully',
+      usersData: users.map((user) => ({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        age: user.age,
+        role: user.userType,
+      })),
+    };
   }
 
-  async remove(id: string): Promise<UserEntity> {
-    const user = await this.prisma.user.findUnique({
+  public async update(id: string, updateUserDto: UpdateUserDto) {
+    const { password, name } = updateUserDto;
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new BadRequestException('User not found');
+    const data: { name?: string; password?: string } = {};
+    if (name) data.name = name;
+    if (password)
+      data.password = await this.authProvider.hashPassword(password);
+    await this.prisma.user.update({
       where: { id },
+      data,
     });
+    return {
+      message: 'User updated successfully',
+    };
+  }
 
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+  public async delete(id: string, payload: JWTPayloadType) {
+    const user = await this.getCurrentUser(id);
+    if (!user) throw new BadRequestException('User not found');
+    const currentUser = await this.prisma.user.findUnique({
+      where: { id: payload.id },
+    });
+    if (
+      currentUser?.userType === UserType.ADMIN ||
+      user.userData.id === payload?.id
+    ) {
+      await this.prisma.user.delete({ where: { id } });
+      return { message: 'user has been removed' };
     }
-
-    return this.prisma.user.delete({
-      where: { id },
-    });
+    throw new UnauthorizedException('You are not allowed');
   }
 }
