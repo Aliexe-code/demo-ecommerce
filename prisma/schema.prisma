@@ -12,16 +12,17 @@ enum UserType {
   NORMAL_USER @map("normal_user")
 }
 model User {
-  id       String @id @default(cuid())
-  email    String @unique
-  name     String
-  password String
-  age      Int?
-  userType  UserType @default(NORMAL_USER)
-  products Products[]
-   reviews   Review[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String @id @default(cuid())
+  email      String @unique
+  name       String
+  password   String
+  age        Int?
+  profilePic String?
+  userType   UserType @default(NORMAL_USER)
+  products   Products[]
+  reviews    Review[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Products{

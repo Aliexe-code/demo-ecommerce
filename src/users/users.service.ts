@@ -4,6 +4,10 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { createWriteStream, existsSync, mkdirSync, unlinkSync } from 'fs';
+import { join } from 'path';
+import type { MultipartFile } from '@fastify/multipart';
+import type { FastifyReply } from 'fastify';
 import { PrismaService } from '../prisma/prisma.service';
 import { JWTPayloadType } from './entities/types';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -14,6 +18,8 @@ import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class UsersService {
+  private readonly uploadDir = join(process.cwd(), 'images');
+  
   constructor(
     private prisma: PrismaService,
     private authProvider: AuthProvider,
@@ -40,6 +46,7 @@ export class UsersService {
         name: user.name,
         age: user.age,
         userType: user.userType,
+        profilePic: user.profilePic ? `/images/${user.profilePic}` : null,
       },
     };
   }
@@ -90,5 +97,110 @@ export class UsersService {
       return { message: 'user has been removed' };
     }
     throw new UnauthorizedException('You are not allowed');
+  }
+
+  public async updateProfilePicture(userId: string, file: MultipartFile) {
+    // Ensure user exists
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    // Delete old profile picture if exists
+    if (user.profilePic) {
+      await this.deleteProfilePictureFile(user.profilePic);
+    }
+
+    // Ensure images directory exists
+    if (!existsSync(this.uploadDir)) {
+      mkdirSync(this.uploadDir, { recursive: true });
+    }
+
+    // Create unique filename
+    const prefix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const filename = `${prefix}-${file.filename}`;
+    const path = join(this.uploadDir, filename);
+
+    // Save file to disk
+    await new Promise<void>((resolve, reject) => {
+      const writeStream = createWriteStream(path);
+      file.file
+        .pipe(writeStream)
+        .on('error', reject)
+        .on('finish', () => resolve());
+    });
+
+    // Update user profile picture in database
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { profilePic: filename },
+    });
+
+    return {
+      message: 'Profile picture updated successfully',
+      filename: filename,
+      imageUrl: `/images/${filename}`,
+    };
+  }
+
+  public async deleteProfilePicture(userId: string) {
+    // Ensure user exists
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    // Check if user has a profile picture
+    if (!user.profilePic) {
+      throw new BadRequestException('User does not have a profile picture');
+    }
+
+    // Delete the file
+    await this.deleteProfilePictureFile(user.profilePic);
+
+    // Update user in database
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { profilePic: null },
+    });
+
+    return {
+      message: 'Profile picture deleted successfully',
+    };
+  }
+
+  public async getProfilePicture(userId: string, reply: FastifyReply) {
+    // Ensure user exists
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    // Check if user has a profile picture
+    if (!user.profilePic) {
+      throw new BadRequestException('User does not have a profile picture');
+    }
+
+    const filePath = join(this.uploadDir, user.profilePic);
+
+    // Check if file exists
+    if (!existsSync(filePath)) {
+      throw new BadRequestException('Profile picture file not found');
+    }
+
+    // Return the file
+    return reply.sendFile(user.profilePic, this.uploadDir);
+  }
+
+  private async deleteProfilePictureFile(filename: string) {
+    try {
+      const filePath = join(this.uploadDir, filename);
+      if (existsSync(filePath)) {
+        unlinkSync(filePath);
+      }
+    } catch (error) {
+      // Just log the error but don't throw, as we still want to update the database
+      console.error('Error deleting profile picture file:', error);
+    }
   }
 }

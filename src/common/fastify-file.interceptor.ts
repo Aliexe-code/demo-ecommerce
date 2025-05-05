@@ -5,9 +5,9 @@ import {
   CallHandler,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { FastifyRequest } from 'fastify';
+import type { FastifyRequest } from 'fastify';
 import * as fastifyMultipart from '@fastify/multipart';
-
+import { BadRequestException } from '@nestjs/common/exceptions';
 @Injectable()
 export class FastifyFileInterceptor implements NestInterceptor {
   constructor(private readonly fieldName: string) {}
@@ -23,15 +23,14 @@ export class FastifyFileInterceptor implements NestInterceptor {
       >();
 
     try {
-      // Check if the request has a file for the specified field
       const file = await request.file();
       if (file && file.fieldname === this.fieldName) {
         request.uploadedFile = file;
       } else {
         request.uploadedFile = undefined;
       }
-    } catch (err) {
-      throw new Error(`File processing error: ${(err as Error).message}`);
+    } catch (error) {
+      throw new BadRequestException(`File processing error: ${error.message}`);
     }
 
     return next.handle();

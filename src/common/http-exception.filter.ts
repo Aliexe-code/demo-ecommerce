@@ -6,7 +6,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
-import { FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 
 interface ExceptionResponse {
   message?: string | string[];

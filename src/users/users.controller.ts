@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -8,7 +9,9 @@ import {
   Param,
   Post,
   Put,
-  UseGuards,
+  Req,
+  Res,
+  UseGuards
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RegisterDto } from './dto/register.dto';
@@ -20,6 +23,7 @@ import { Roles } from './decorators/role-user.decorators';
 import { UserType } from '@prisma/client';
 import { AuthRolesGuard } from './guards/auth-roles.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
+import type { FastifyRequest, FastifyReply } from 'fastify';
 @Controller('api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -65,5 +69,40 @@ export class UsersController {
     @CurrentUser() payload: JWTPayloadType,
   ) {
     return this.usersService.delete(id, payload);
+  }
+
+  @Post('upload-image')
+  @UseGuards(AuthGuard)
+  public async uploadProfileImage(
+    @Req() request: FastifyRequest,
+    @CurrentUser() payload: JWTPayloadType
+  ) {
+    if (!request.isMultipart()) {
+      throw new BadRequestException('Request is not multipart');
+    }
+
+    const data = await request.file();
+    if (!data) {
+      throw new BadRequestException('No file provided');
+    }
+
+    return this.usersService.updateProfilePicture(payload.id, data);
+  }
+
+  @Delete('delete-image')
+  @UseGuards(AuthGuard)
+  public async deleteProfileImage(
+    @CurrentUser() payload: JWTPayloadType
+  ) {
+    return this.usersService.deleteProfilePicture(payload.id);
+  }
+
+  @Get('profile-image')
+  @UseGuards(AuthGuard)
+  public async getProfileImage(
+    @CurrentUser() payload: JWTPayloadType,
+    @Res() reply: FastifyReply
+  ) {
+    return this.usersService.getProfilePicture(payload.id, reply);
   }
 }
