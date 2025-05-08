@@ -192,7 +192,7 @@ export class UsersService {
     return reply.sendFile(user.profilePic, this.uploadDir);
   }
 
-  private async deleteProfilePictureFile(filename: string) {
+  public async deleteProfilePictureFile(filename: string) {
     try {
       const filePath = join(this.uploadDir, filename);
       if (existsSync(filePath)) {
@@ -202,5 +202,68 @@ export class UsersService {
       // Just log the error but don't throw, as we still want to update the database
       console.error('Error deleting profile picture file:', error);
     }
+  }
+
+  public async forgotPassword(email: string) {
+    return this.authProvider.sendResetPasswordMail(email);
+  }
+
+  public async resetPassword(email: string, code: string, password: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+
+    if (!user.resetPasswordToken) {
+      throw new BadRequestException('Invalid or expired verification code.');
+    }
+
+    if (user.resetPasswordToken !== code) {
+      throw new BadRequestException('Invalid verification code.');
+    }
+
+    const hashedPassword = await this.authProvider.hashPassword(password);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetPasswordToken: null, // Clear the code after password reset
+      },
+    });
+
+    return { message: 'Password has been reset successfully.' };
+  }
+
+  public async verifyEmail(userId: string, verificationToken: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+    
+
+    if (user.emailVerified) {
+      throw new BadRequestException('Email is already verified.');
+    }
+
+    if (user.verificationToken !== verificationToken) {
+      throw new BadRequestException('Invalid verification token.');
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        emailVerified: true,
+        verificationToken: null, // Clear the token after verification
+      },
+    });
+
+    return { message: 'Email verified successfully.' };
   }
 }

@@ -7,6 +7,7 @@ import { HealthController } from './health.controller';
 import { ProductModule } from '@/products/product.module';
 import { ReviewsModule } from '@/reviews/reviews.module';
 import { UploadsModule } from '@/uploads/uploads.module';
+import { MailModule } from '@/mail/mail.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { UploadsModule } from '@/uploads/uploads.module';
     ProductModule,
     ReviewsModule,
     UploadsModule,
+    MailModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',

@@ -5,6 +5,10 @@
   "entryFile": "app/main",
   "compilerOptions": {
     "deleteOutDir": true,
+    "assets": [{
+      "include": "./mail/templates",
+      "outDir": "dist/"
+    }],
     "outputPath": "dist",
     "watchAssets": true,
     "plugins": ["@nestjs/swagger"],

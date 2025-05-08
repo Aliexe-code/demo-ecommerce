@@ -16,6 +16,8 @@ import {
 import { UsersService } from './users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AuthGuard } from './guards/auth.guard';
 import type { JWTPayloadType } from './entities/types';
 import { CurrentUser } from './decorators/current-user.decorators';
@@ -104,5 +106,26 @@ export class UsersController {
     @Res() reply: FastifyReply
   ) {
     return this.usersService.getProfilePicture(payload.id, reply);
+  }
+  @Get('verify-email/:id/:token')
+  public async verifyEmail(
+    @Param('id') id: string,
+    @Param('token') token: string,
+  ) {
+    return this.usersService.verifyEmail(id, token);
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  public async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.usersService.forgotPassword(forgotPasswordDto.email);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  public async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ) {
+    return this.usersService.resetPassword(resetPasswordDto.email, resetPasswordDto.code, resetPasswordDto.password);
   }
 }
