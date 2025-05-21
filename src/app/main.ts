@@ -9,22 +9,21 @@ import { AllExceptionsFilter } from '../common/http-exception.filter';
 import multipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
 import { join } from 'path';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import helmet from '@fastify/helmet'
+
 async function bootstrap() {
-  console.log('Creating NestJS app...');
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter({
-      logger: false,
-    }),
+    new FastifyAdapter(),
   );
   app.useLogger(logger);
-
-  // Register multipart plugin
+  app.register(helmet)
   await app.register(multipart, {
     limits: {
-      fileSize: 10 * 1024 * 1024, // 10MB limit
-      files: 10, // Allow up to 10 files
+      fileSize: 10 * 1024 * 1024,
+      files: 10,
     },
   });
   await app.register(fastifyStatic, {
@@ -42,7 +41,9 @@ async function bootstrap() {
       },
     }),
   );
-
+  const swagger = new DocumentBuilder().setVersion("1.0").build();
+  const documentation = SwaggerModule.createDocument(app, swagger)
+  SwaggerModule.setup("swagger", app, documentation)
   app.enableShutdownHooks();
 
   const port = process.env.PORT ?? 3000;
