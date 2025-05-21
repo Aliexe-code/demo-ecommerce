@@ -1,27 +1,28 @@
-import { Injectable } from "@nestjs/common";
-import { MailerService } from "@nestjs-modules/mailer";
-import { join } from "node:path";
-import * as fs from "fs";
+import { Injectable } from '@nestjs/common';
+import { MailerService } from '@nestjs-modules/mailer';
+import { join } from 'node:path';
+import * as fs from 'fs';
 
 @Injectable()
-export class MailService{
-    constructor(private readonly mailerService: MailerService){}
+export class MailService {
+  constructor(private readonly mailerService: MailerService) {}
 
-    public async sendLoginMail(email: string){
-        try {
-            const templatePath = join(process.cwd(), 'src/mail/templates/login.ejs');
-            console.log('Template exists:', fs.existsSync(templatePath));
-            console.log('Template path:', templatePath);
-            
-            const today = new Date()
-            const formattedDate = today.toLocaleDateString();
-            const formattedTime = today.toLocaleTimeString();
-            
-            await this.mailerService.sendMail({
-              to: email,
-              from: `"NestJS App" <noreply@mynestjs-app.com>`,
-              subject: 'New Login to Your Account',
-              html: `
+  public async sendLoginMail(email: string) {
+    try {
+      const templatePath = join(process.cwd(), 'src/mail/templates/login.ejs');
+      console.log('Template exists:', fs.existsSync(templatePath));
+      console.log('Template path:', templatePath);
+
+      const today = new Date();
+      const formattedDate = today.toLocaleDateString();
+      const formattedTime = today.toLocaleTimeString();
+
+      await this.mailerService
+        .sendMail({
+          to: email,
+          from: `"NestJS App" <noreply@mynestjs-app.com>`,
+          subject: 'New Login to Your Account',
+          html: `
                 <!DOCTYPE html>
                 <html lang="en">
                 <head>
@@ -63,26 +64,30 @@ export class MailService{
                     </div>
                 </body>
                 </html>
-              `
-            }).catch(err => {
-              console.log('Login notification email could not be sent, but login continues');
-              console.log('Full error:', err);
-              console.log('Stack:', err.stack);
-            })
-          } catch (error) {
-            console.log('Email error:', error);
-          }
+              `,
+        })
+        .catch((err) => {
+          console.log(
+            'Login notification email could not be sent, but login continues',
+          );
+          console.log('Full error:', err);
+          console.log('Stack:', err.stack);
+        });
+    } catch (error) {
+      console.log('Email error:', error);
     }
+  }
 
-    public async sendVerifyMail(email:string,link:string){
-      try {
-        const templatePath = join(process.cwd(), 'src/mail/templates/login.ejs');
-        console.log('Template exists:', fs.existsSync(templatePath));
-        console.log('Template path:', templatePath);
-        
-        const today = new Date()
-        
-        await this.mailerService.sendMail({
+  public async sendVerifyMail(email: string, link: string) {
+    try {
+      const templatePath = join(process.cwd(), 'src/mail/templates/login.ejs');
+      console.log('Template exists:', fs.existsSync(templatePath));
+      console.log('Template path:', templatePath);
+
+      const today = new Date();
+
+      await this.mailerService
+        .sendMail({
           to: email,
           from: `"NestJS App" <noreply@mynestjs-app.com>`,
           subject: 'Verify Your Email Address',
@@ -134,29 +139,31 @@ export class MailService{
                 </div>
             </body>
             </html>
-          `
-        }).catch(err => {
+          `,
+        })
+        .catch((err) => {
           console.log('Verification email could not be sent.');
           console.log('Full error:', err);
           console.log('Stack:', err.stack);
-        })
-      } catch (error) {
-        console.log('Email error:', error);
-      }
-}
-    public async sendResetPasswordMail(email:string, code:string){
+        });
+    } catch (error) {
+      console.log('Email error:', error);
+    }
+  }
+  public async sendResetPasswordMail(email: string, code: string) {
     try {
-      const templatePath = join(process.cwd(),'src/mail/templates/login.ejs');
+      const templatePath = join(process.cwd(), 'src/mail/templates/login.ejs');
       console.log('Template exists:', fs.existsSync(templatePath));
       console.log('Template path:', templatePath);
 
-      const today = new Date()
-      
-      await this.mailerService.sendMail({
-        to: email,
-        from: `"NestJS App" <noreply@mynestjs-app.com>`,
-        subject: 'Reset Your Password',
-        html: `
+      const today = new Date();
+
+      await this.mailerService
+        .sendMail({
+          to: email,
+          from: `"NestJS App" <noreply@mynestjs-app.com>`,
+          subject: 'Reset Your Password',
+          html: `
           <!DOCTYPE html>
           <html lang="en">
           <head>
@@ -208,12 +215,13 @@ export class MailService{
               </div>
           </body>
           </html>
-        `
-      }).catch(err => {
-        console.log('Password reset email could not be sent.');
-        console.log('Full error:', err);
-        console.log('Stack:', err.stack);
-      });
+        `,
+        })
+        .catch((err) => {
+          console.log('Password reset email could not be sent.');
+          console.log('Full error:', err);
+          console.log('Stack:', err.stack);
+        });
     } catch (error) {
       console.log('Email error:', error);
     }

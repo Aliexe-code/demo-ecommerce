@@ -10,7 +10,7 @@ import multipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
 import { join } from 'path';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import helmet from '@fastify/helmet'
+import helmet from '@fastify/helmet';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -19,7 +19,7 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
   app.useLogger(logger);
-  app.register(helmet)
+  app.register(helmet);
   await app.register(multipart, {
     limits: {
       fileSize: 10 * 1024 * 1024,
@@ -41,9 +41,9 @@ async function bootstrap() {
       },
     }),
   );
-  const swagger = new DocumentBuilder().setVersion("1.0").build();
-  const documentation = SwaggerModule.createDocument(app, swagger)
-  SwaggerModule.setup("swagger", app, documentation)
+  const swagger = new DocumentBuilder().setVersion('1.0').build();
+  const documentation = SwaggerModule.createDocument(app, swagger);
+  SwaggerModule.setup('swagger', app, documentation);
   app.enableShutdownHooks();
 
   const port = process.env.PORT ?? 3000;

@@ -17,8 +17,8 @@ export class AuthProvider {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly mailService:MailService,
-    private readonly config:ConfigService
+    private readonly mailService: MailService,
+    private readonly config: ConfigService,
   ) {}
 
   public async register(registerUserDto: RegisterDto): Promise<Response> {
@@ -36,9 +36,11 @@ export class AuthProvider {
     const link = this.generateLink(createdUser.id, verificationToken);
     await this.mailService.sendVerifyMail(createdUser.email, link);
 
-
-  return {
-      message: 'User registered successfully. Please check your email to verify your account.'}}
+    return {
+      message:
+        'User registered successfully. Please check your email to verify your account.',
+    };
+  }
 
   public async login(loginDto: LoginDto): Promise<Response> {
     const { email, password } = loginDto;
@@ -48,24 +50,25 @@ export class AuthProvider {
     if (!user) throw new BadRequestException('Invalid email or password');
     const match = await argon2.verify(user.password, password);
     if (!match) throw new UnauthorizedException('Invalid email or password');
-    
-    if(!user.emailVerified){
-     let verificationToken = user.verificationToken;
-     if(!verificationToken) {
-      user.verificationToken = randomBytes(32).toString('hex');
-      const result = await this.prisma.user.update({
-        where: { id: user.id },
-        data: { verificationToken },
-      });
-      verificationToken = result.verificationToken;
-     }
-     if (verificationToken) {
-       const link = this.generateLink(user.id, verificationToken);
-       await this.mailService.sendVerifyMail(user.email, link);
-       throw new UnauthorizedException('Please verify your email. A verification link has been sent to your email address.');
-       return {message:"verification token has been sent to your email"}
-     }
 
+    if (!user.emailVerified) {
+      let verificationToken = user.verificationToken;
+      if (!verificationToken) {
+        user.verificationToken = randomBytes(32).toString('hex');
+        const result = await this.prisma.user.update({
+          where: { id: user.id },
+          data: { verificationToken },
+        });
+        verificationToken = result.verificationToken;
+      }
+      if (verificationToken) {
+        const link = this.generateLink(user.id, verificationToken);
+        await this.mailService.sendVerifyMail(user.email, link);
+        throw new UnauthorizedException(
+          'Please verify your email. A verification link has been sent to your email address.',
+        );
+        return { message: 'verification token has been sent to your email' };
+      }
     }
 
     const accessToken: string = await this.generateJWT({
@@ -82,21 +85,21 @@ export class AuthProvider {
       },
     };
   }
-  public async sendResetPasswordMail(email:string){
-    const user = await this.prisma.user.findUnique({where:{email}});
+  public async sendResetPasswordMail(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) {
       throw new BadRequestException('User with this email does not exist');
     }
-    
+
     // Generate 6-digit reset code
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
-    
+
     // Update user with reset password token (store the 6-digit code)
     await this.prisma.user.update({
       where: { id: user.id },
-      data: { resetPasswordToken: resetCode }
+      data: { resetPasswordToken: resetCode },
     });
-    
+
     // Send reset password email with code
     try {
       await this.mailService.sendResetPasswordMail(email, resetCode);
@@ -112,7 +115,7 @@ export class AuthProvider {
   private generateJWT(payload: JWTPayloadType): Promise<string> {
     return this.jwtService.signAsync(payload);
   }
-  private generateLink(userId:string,verificationToken:string): string {
-    return `${this.config.get<string>("DOMAIN")}/api/users/verify-email/${userId}/${verificationToken}`;
+  private generateLink(userId: string, verificationToken: string): string {
+    return `${this.config.get<string>('DOMAIN')}/api/users/verify-email/${userId}/${verificationToken}`;
   }
 }

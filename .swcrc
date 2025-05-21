@@ -22,9 +22,8 @@
     }
   },
   "module": {
-    "type": "commonjs"
+    "type": "es6"
   },
   "sourceMaps": true,
-  "minify": false,
-  "watch": true
+  "minify": false
 }

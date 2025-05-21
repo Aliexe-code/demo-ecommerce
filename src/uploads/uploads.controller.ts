@@ -72,7 +72,7 @@ export class UploadsController {
       url: string;
     }> = [];
     const parts = request.parts();
-    
+
     for await (const part of parts) {
       if (part.type === 'file') {
         const prefix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
@@ -92,7 +92,7 @@ export class UploadsController {
           filename: filename,
           originalName: part.filename,
           mimetype: part.mimetype,
-          url: `/images/${filename}`
+          url: `/images/${filename}`,
         });
       }
     }

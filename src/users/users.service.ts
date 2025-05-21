@@ -19,7 +19,7 @@ import { LoginDto } from './dto/login.dto';
 @Injectable()
 export class UsersService {
   private readonly uploadDir = join(process.cwd(), 'images');
-  
+
   constructor(
     private prisma: PrismaService,
     private authProvider: AuthProvider,
@@ -246,7 +246,6 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found.');
     }
-    
 
     if (user.emailVerified) {
       throw new BadRequestException('Email is already verified.');

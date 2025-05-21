@@ -23,17 +23,18 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
       envFilePath: '.env',
     }),
     ThrottlerModule.forRoot({
-      throttlers: [{
-        ttl: 6000,
-        limit: 10
-      }]
-    })
+      throttlers: [
+        {
+          ttl: 6000,
+          limit: 10,
+        },
+      ],
+    }),
   ],
   controllers: [HealthController],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: ClassSerializerInterceptor },
-    { provide: APP_GUARD, useClass: ThrottlerGuard }
-
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
-export class AppModule { }
+export class AppModule {}

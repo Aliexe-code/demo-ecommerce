@@ -11,7 +11,7 @@ import {
   Put,
   Req,
   Res,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RegisterDto } from './dto/register.dto';
@@ -77,7 +77,7 @@ export class UsersController {
   @UseGuards(AuthGuard)
   public async uploadProfileImage(
     @Req() request: FastifyRequest,
-    @CurrentUser() payload: JWTPayloadType
+    @CurrentUser() payload: JWTPayloadType,
   ) {
     if (!request.isMultipart()) {
       throw new BadRequestException('Request is not multipart');
@@ -93,9 +93,7 @@ export class UsersController {
 
   @Delete('delete-image')
   @UseGuards(AuthGuard)
-  public async deleteProfileImage(
-    @CurrentUser() payload: JWTPayloadType
-  ) {
+  public async deleteProfileImage(@CurrentUser() payload: JWTPayloadType) {
     return this.usersService.deleteProfilePicture(payload.id);
   }
 
@@ -103,7 +101,7 @@ export class UsersController {
   @UseGuards(AuthGuard)
   public async getProfileImage(
     @CurrentUser() payload: JWTPayloadType,
-    @Res() reply: FastifyReply
+    @Res() reply: FastifyReply,
   ) {
     return this.usersService.getProfilePicture(payload.id, reply);
   }
@@ -123,9 +121,11 @@ export class UsersController {
 
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
-  public async resetPassword(
-    @Body() resetPasswordDto: ResetPasswordDto,
-  ) {
-    return this.usersService.resetPassword(resetPasswordDto.email, resetPasswordDto.code, resetPasswordDto.password);
+  public async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.usersService.resetPassword(
+      resetPasswordDto.email,
+      resetPasswordDto.code,
+      resetPasswordDto.password,
+    );
   }
 }
