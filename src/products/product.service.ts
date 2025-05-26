@@ -1,17 +1,17 @@
-import { UsersService } from '@/users/users.service';
+import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dtos/createProduct.dto';
 import { ProductResponse } from './entities/types';
 import { UpdateProductDto } from './dtos/updateProduct.dto';
-import { Prisma } from '@prisma/client'; // Add this import
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly userService: UsersService,
-  ) {}
+  ) { }
 
   public async createProduct(
     dto: CreateProductDto,
