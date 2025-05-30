@@ -95,7 +95,8 @@ describe('Product DTO Validation Tests', () => {
         // Arrange
         const dto = plainToClass(CreateProductDto, {
           title: 'Valid Product Title',
-          description: 'This is a valid product description with enough characters',
+          description:
+            'This is a valid product description with enough characters',
           price: 99.99,
         });
 
@@ -271,9 +272,11 @@ describe('Product DTO Validation Tests', () => {
         // Assert
         expect(errors).toHaveLength(3);
 
-        const titleError = errors.find(e => e.property === 'title');
-        const descriptionError = errors.find(e => e.property === 'description');
-        const priceError = errors.find(e => e.property === 'price');
+        const titleError = errors.find((e) => e.property === 'title');
+        const descriptionError = errors.find(
+          (e) => e.property === 'description',
+        );
+        const priceError = errors.find((e) => e.property === 'price');
 
         expect(titleError?.constraints).toHaveProperty('minLength');
         expect(descriptionError?.constraints).toHaveProperty('minLength');
@@ -427,9 +430,11 @@ describe('Product DTO Validation Tests', () => {
         // Assert
         expect(errors).toHaveLength(3);
 
-        const titleError = errors.find(e => e.property === 'title');
-        const descriptionError = errors.find(e => e.property === 'description');
-        const priceError = errors.find(e => e.property === 'price');
+        const titleError = errors.find((e) => e.property === 'title');
+        const descriptionError = errors.find(
+          (e) => e.property === 'description',
+        );
+        const priceError = errors.find((e) => e.property === 'price');
 
         expect(titleError?.constraints).toHaveProperty('minLength');
         expect(descriptionError?.constraints).toHaveProperty('minLength');

@@ -107,10 +107,15 @@ describe('Product Integration Tests', () => {
     it('should create a product through the complete flow', async () => {
       // Arrange
       vi.spyOn(usersService, 'getCurrentUser').mockResolvedValue(mockUser);
-      vi.spyOn(prismaService.products, 'create').mockResolvedValue(mockCreatedProduct);
+      vi.spyOn(prismaService.products, 'create').mockResolvedValue(
+        mockCreatedProduct,
+      );
 
       // Act - Test the complete flow: Controller -> Service -> Database
-      const result = await productController.createNewProduct(mockCreateProductDto, mockJWTPayload);
+      const result = await productController.createNewProduct(
+        mockCreateProductDto,
+        mockJWTPayload,
+      );
 
       // Assert
       expect(usersService.getCurrentUser).toHaveBeenCalledWith('user-123');
@@ -138,12 +143,15 @@ describe('Product Integration Tests', () => {
     it('should handle user not found during product creation', async () => {
       // Arrange
       vi.spyOn(usersService, 'getCurrentUser').mockRejectedValue(
-        new NotFoundException('User not found')
+        new NotFoundException('User not found'),
       );
 
       // Act & Assert
       await expect(
-        productController.createNewProduct(mockCreateProductDto, mockJWTPayload)
+        productController.createNewProduct(
+          mockCreateProductDto,
+          mockJWTPayload,
+        ),
       ).rejects.toThrow(NotFoundException);
 
       expect(usersService.getCurrentUser).toHaveBeenCalledWith('user-123');
@@ -155,10 +163,16 @@ describe('Product Integration Tests', () => {
     it('should get all products with filters through complete flow', async () => {
       // Arrange
       const mockProducts = [mockProductWithRelations];
-      vi.spyOn(prismaService.products, 'findMany').mockResolvedValue(mockProducts);
+      vi.spyOn(prismaService.products, 'findMany').mockResolvedValue(
+        mockProducts,
+      );
 
       // Act
-      const result = await productController.getAllProducts('integration', '100', '300');
+      const result = await productController.getAllProducts(
+        'integration',
+        '100',
+        '300',
+      );
 
       // Assert
       expect(prismaService.products.findMany).toHaveBeenCalledWith({
@@ -191,10 +205,14 @@ describe('Product Integration Tests', () => {
 
     it('should get product by ID through complete flow', async () => {
       // Arrange
-      vi.spyOn(prismaService.products, 'findUnique').mockResolvedValue(mockProductWithRelations);
+      vi.spyOn(prismaService.products, 'findUnique').mockResolvedValue(
+        mockProductWithRelations,
+      );
 
       // Act
-      const result = await productController.getProductById({ id: 'product-integration-123' });
+      const result = await productController.getProductById({
+        id: 'product-integration-123',
+      });
 
       // Assert
       expect(prismaService.products.findUnique).toHaveBeenCalledWith({
@@ -229,14 +247,23 @@ describe('Product Integration Tests', () => {
       };
 
       // Mock the service's getProductById method (used internally by updateProduct)
-      vi.spyOn(productService, 'getProductById').mockResolvedValue(mockProductWithRelations);
-      vi.spyOn(prismaService.products, 'update').mockResolvedValue(updatedProduct);
+      vi.spyOn(productService, 'getProductById').mockResolvedValue(
+        mockProductWithRelations,
+      );
+      vi.spyOn(prismaService.products, 'update').mockResolvedValue(
+        updatedProduct,
+      );
 
       // Act
-      const result = await productController.updateProduct('product-integration-123', updateDto);
+      const result = await productController.updateProduct(
+        'product-integration-123',
+        updateDto,
+      );
 
       // Assert
-      expect(productService.getProductById).toHaveBeenCalledWith('product-integration-123');
+      expect(productService.getProductById).toHaveBeenCalledWith(
+        'product-integration-123',
+      );
       expect(prismaService.products.update).toHaveBeenCalledWith({
         where: { id: 'product-integration-123' },
         data: {
@@ -265,10 +292,12 @@ describe('Product Integration Tests', () => {
 
       // Act & Assert
       await expect(
-        productController.updateProduct('non-existent-id', updateDto)
+        productController.updateProduct('non-existent-id', updateDto),
       ).rejects.toThrow('Product not found');
 
-      expect(productService.getProductById).toHaveBeenCalledWith('non-existent-id');
+      expect(productService.getProductById).toHaveBeenCalledWith(
+        'non-existent-id',
+      );
       expect(prismaService.products.update).not.toHaveBeenCalled();
     });
   });
@@ -276,14 +305,22 @@ describe('Product Integration Tests', () => {
   describe('Product Deletion Flow', () => {
     it('should delete a product through complete flow', async () => {
       // Arrange
-      vi.spyOn(productService, 'getProductById').mockResolvedValue(mockProductWithRelations);
-      vi.spyOn(prismaService.products, 'delete').mockResolvedValue(mockCreatedProduct);
+      vi.spyOn(productService, 'getProductById').mockResolvedValue(
+        mockProductWithRelations,
+      );
+      vi.spyOn(prismaService.products, 'delete').mockResolvedValue(
+        mockCreatedProduct,
+      );
 
       // Act
-      const result = await productController.deleteProduct('product-integration-123');
+      const result = await productController.deleteProduct(
+        'product-integration-123',
+      );
 
       // Assert
-      expect(productService.getProductById).toHaveBeenCalledWith('product-integration-123');
+      expect(productService.getProductById).toHaveBeenCalledWith(
+        'product-integration-123',
+      );
       expect(prismaService.products.delete).toHaveBeenCalledWith({
         where: { id: 'product-integration-123' },
       });
@@ -299,10 +336,12 @@ describe('Product Integration Tests', () => {
 
       // Act & Assert
       await expect(
-        productController.deleteProduct('non-existent-id')
+        productController.deleteProduct('non-existent-id'),
       ).rejects.toThrow('Product not found');
 
-      expect(productService.getProductById).toHaveBeenCalledWith('non-existent-id');
+      expect(productService.getProductById).toHaveBeenCalledWith(
+        'non-existent-id',
+      );
       expect(prismaService.products.delete).not.toHaveBeenCalled();
     });
   });
@@ -311,18 +350,20 @@ describe('Product Integration Tests', () => {
     it('should properly integrate service and controller layers', async () => {
       // Arrange
       vi.spyOn(usersService, 'getCurrentUser').mockResolvedValue(mockUser);
-      vi.spyOn(prismaService.products, 'create').mockResolvedValue(mockCreatedProduct);
+      vi.spyOn(prismaService.products, 'create').mockResolvedValue(
+        mockCreatedProduct,
+      );
 
       // Act - Test that controller properly delegates to service
       const controllerResult = await productController.createNewProduct(
         mockCreateProductDto,
-        mockJWTPayload
+        mockJWTPayload,
       );
 
       // Also test service directly
       const serviceResult = await productService.createProduct(
         mockCreateProductDto,
-        'user-123'
+        'user-123',
       );
 
       // Assert - Both should produce the same result

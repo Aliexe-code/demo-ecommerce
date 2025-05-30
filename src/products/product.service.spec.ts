@@ -79,10 +79,15 @@ describe('ProductService', () => {
     it('should create a product successfully', async () => {
       // Arrange
       vi.spyOn(usersService, 'getCurrentUser').mockResolvedValue(mockUser);
-      vi.spyOn(prismaService.products, 'create').mockResolvedValue(mockCreatedProduct);
+      vi.spyOn(prismaService.products, 'create').mockResolvedValue(
+        mockCreatedProduct,
+      );
 
       // Act
-      const result = await service.createProduct(mockCreateProductDto, 'user-123');
+      const result = await service.createProduct(
+        mockCreateProductDto,
+        'user-123',
+      );
 
       // Assert
       expect(usersService.getCurrentUser).toHaveBeenCalledWith('user-123');
@@ -120,7 +125,9 @@ describe('ProductService', () => {
       };
 
       vi.spyOn(usersService, 'getCurrentUser').mockResolvedValue(mockUser);
-      vi.spyOn(prismaService.products, 'create').mockResolvedValue(mockProductWithLowercaseTitle);
+      vi.spyOn(prismaService.products, 'create').mockResolvedValue(
+        mockProductWithLowercaseTitle,
+      );
 
       // Act
       await service.createProduct(dtoWithUppercaseTitle, 'user-123');
@@ -144,10 +151,15 @@ describe('ProductService', () => {
       };
 
       vi.spyOn(usersService, 'getCurrentUser').mockResolvedValue(mockUser);
-      vi.spyOn(prismaService.products, 'create').mockResolvedValue(mockProductWithNullDescription);
+      vi.spyOn(prismaService.products, 'create').mockResolvedValue(
+        mockProductWithNullDescription,
+      );
 
       // Act
-      const result = await service.createProduct(mockCreateProductDto, 'user-123');
+      const result = await service.createProduct(
+        mockCreateProductDto,
+        'user-123',
+      );
 
       // Assert
       expect(result.product.description).toBe(''); // Should convert null to empty string
@@ -156,15 +168,17 @@ describe('ProductService', () => {
     it('should throw error when user is not found', async () => {
       // Arrange
       vi.spyOn(usersService, 'getCurrentUser').mockRejectedValue(
-        new NotFoundException('User not found')
+        new NotFoundException('User not found'),
       );
 
       // Act & Assert
       await expect(
-        service.createProduct(mockCreateProductDto, 'invalid-user-id')
+        service.createProduct(mockCreateProductDto, 'invalid-user-id'),
       ).rejects.toThrow(NotFoundException);
 
-      expect(usersService.getCurrentUser).toHaveBeenCalledWith('invalid-user-id');
+      expect(usersService.getCurrentUser).toHaveBeenCalledWith(
+        'invalid-user-id',
+      );
       expect(prismaService.products.create).not.toHaveBeenCalled();
     });
 
@@ -172,12 +186,12 @@ describe('ProductService', () => {
       // Arrange
       vi.spyOn(usersService, 'getCurrentUser').mockResolvedValue(mockUser);
       vi.spyOn(prismaService.products, 'create').mockRejectedValue(
-        new Error('Database connection failed')
+        new Error('Database connection failed'),
       );
 
       // Act & Assert
       await expect(
-        service.createProduct(mockCreateProductDto, 'user-123')
+        service.createProduct(mockCreateProductDto, 'user-123'),
       ).rejects.toThrow('Database connection failed');
 
       expect(usersService.getCurrentUser).toHaveBeenCalledWith('user-123');
@@ -194,7 +208,9 @@ describe('ProductService', () => {
         },
       };
 
-      vi.spyOn(usersService, 'getCurrentUser').mockResolvedValue(differentUserData);
+      vi.spyOn(usersService, 'getCurrentUser').mockResolvedValue(
+        differentUserData,
+      );
       vi.spyOn(prismaService.products, 'create').mockResolvedValue({
         ...mockCreatedProduct,
         userId: 'different-user-id',
@@ -221,7 +237,7 @@ describe('ProductService', () => {
         id: 'product-1',
         title: 'laptop',
         description: 'Gaming laptop',
-        price: 1500.00,
+        price: 1500.0,
         userId: 'user-1',
         user: { name: 'John Doe', email: 'john@example.com' },
         reviews: [],
@@ -232,7 +248,7 @@ describe('ProductService', () => {
         id: 'product-2',
         title: 'mouse',
         description: 'Wireless mouse',
-        price: 50.00,
+        price: 50.0,
         userId: 'user-2',
         user: { name: 'Jane Smith', email: 'jane@example.com' },
         reviews: [],
@@ -243,7 +259,9 @@ describe('ProductService', () => {
 
     it('should return all products without filters', async () => {
       // Arrange
-      vi.spyOn(prismaService.products, 'findMany').mockResolvedValue(mockProducts);
+      vi.spyOn(prismaService.products, 'findMany').mockResolvedValue(
+        mockProducts,
+      );
 
       // Act
       const result = await service.getAllProducts();
@@ -271,7 +289,9 @@ describe('ProductService', () => {
     it('should filter products by title', async () => {
       // Arrange
       const filteredProducts = [mockProducts[0]]; // Only laptop
-      vi.spyOn(prismaService.products, 'findMany').mockResolvedValue(filteredProducts);
+      vi.spyOn(prismaService.products, 'findMany').mockResolvedValue(
+        filteredProducts,
+      );
 
       // Act
       const result = await service.getAllProducts('laptop');
@@ -301,7 +321,9 @@ describe('ProductService', () => {
     it('should filter products by minimum price', async () => {
       // Arrange
       const filteredProducts = [mockProducts[0]]; // Only laptop (>= 100)
-      vi.spyOn(prismaService.products, 'findMany').mockResolvedValue(filteredProducts);
+      vi.spyOn(prismaService.products, 'findMany').mockResolvedValue(
+        filteredProducts,
+      );
 
       // Act
       const result = await service.getAllProducts(undefined, 100);
@@ -330,7 +352,9 @@ describe('ProductService', () => {
     it('should filter products by maximum price', async () => {
       // Arrange
       const filteredProducts = [mockProducts[1]]; // Only mouse (<= 100)
-      vi.spyOn(prismaService.products, 'findMany').mockResolvedValue(filteredProducts);
+      vi.spyOn(prismaService.products, 'findMany').mockResolvedValue(
+        filteredProducts,
+      );
 
       // Act
       const result = await service.getAllProducts(undefined, undefined, 100);
@@ -358,7 +382,9 @@ describe('ProductService', () => {
 
     it('should filter products by price range', async () => {
       // Arrange
-      vi.spyOn(prismaService.products, 'findMany').mockResolvedValue(mockProducts);
+      vi.spyOn(prismaService.products, 'findMany').mockResolvedValue(
+        mockProducts,
+      );
 
       // Act
       const result = await service.getAllProducts(undefined, 50, 2000);
@@ -387,7 +413,9 @@ describe('ProductService', () => {
 
     it('should filter products by title and price range', async () => {
       // Arrange
-      vi.spyOn(prismaService.products, 'findMany').mockResolvedValue([mockProducts[0]]);
+      vi.spyOn(prismaService.products, 'findMany').mockResolvedValue([
+        mockProducts[0],
+      ]);
 
       // Act
       const result = await service.getAllProducts('laptop', 1000, 2000);
@@ -434,7 +462,9 @@ describe('ProductService', () => {
 
     it('should return a product by id', async () => {
       // Arrange
-      vi.spyOn(prismaService.products, 'findUnique').mockResolvedValue(mockProduct);
+      vi.spyOn(prismaService.products, 'findUnique').mockResolvedValue(
+        mockProduct,
+      );
 
       // Act
       const result = await service.getProductById('product-123');
@@ -486,7 +516,7 @@ describe('ProductService', () => {
       id: 'product-123',
       title: 'old title',
       description: 'old description',
-      price: 50.00,
+      price: 50.0,
       userId: 'user-123',
       user: { name: 'Test User', email: 'test@example.com' },
       reviews: [],
@@ -498,7 +528,7 @@ describe('ProductService', () => {
       id: 'product-123',
       title: 'new title',
       description: 'new description',
-      price: 75.00,
+      price: 75.0,
       userId: 'user-123',
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -507,13 +537,17 @@ describe('ProductService', () => {
     const updateDto = {
       title: 'new title',
       description: 'new description',
-      price: 75.00,
+      price: 75.0,
     };
 
     it('should update a product successfully', async () => {
       // Arrange
-      vi.spyOn(service, 'getProductById').mockResolvedValue(mockExistingProduct);
-      vi.spyOn(prismaService.products, 'update').mockResolvedValue(mockUpdatedProduct);
+      vi.spyOn(service, 'getProductById').mockResolvedValue(
+        mockExistingProduct,
+      );
+      vi.spyOn(prismaService.products, 'update').mockResolvedValue(
+        mockUpdatedProduct,
+      );
 
       // Act
       const result = await service.updateProduct('product-123', updateDto);
@@ -525,7 +559,7 @@ describe('ProductService', () => {
         data: {
           title: 'new title',
           description: 'new description',
-          price: 75.00,
+          price: 75.0,
         },
       });
 
@@ -535,7 +569,7 @@ describe('ProductService', () => {
           id: 'product-123',
           title: 'new title',
           description: 'new description',
-          price: 75.00,
+          price: 75.0,
           userId: 'user-123',
         },
       });
@@ -549,11 +583,18 @@ describe('ProductService', () => {
         title: 'updated title only',
       };
 
-      vi.spyOn(service, 'getProductById').mockResolvedValue(mockExistingProduct);
-      vi.spyOn(prismaService.products, 'update').mockResolvedValue(partiallyUpdatedProduct);
+      vi.spyOn(service, 'getProductById').mockResolvedValue(
+        mockExistingProduct,
+      );
+      vi.spyOn(prismaService.products, 'update').mockResolvedValue(
+        partiallyUpdatedProduct,
+      );
 
       // Act
-      const result = await service.updateProduct('product-123', partialUpdateDto);
+      const result = await service.updateProduct(
+        'product-123',
+        partialUpdateDto,
+      );
 
       // Assert
       expect(prismaService.products.update).toHaveBeenCalledWith({
@@ -561,7 +602,7 @@ describe('ProductService', () => {
         data: {
           title: 'updated title only',
           description: 'old description', // Should keep existing value
-          price: 50.00, // Should keep existing value
+          price: 50.0, // Should keep existing value
         },
       });
 
@@ -574,7 +615,7 @@ describe('ProductService', () => {
 
       // Act & Assert
       await expect(
-        service.updateProduct('non-existent-id', updateDto)
+        service.updateProduct('non-existent-id', updateDto),
       ).rejects.toThrow('Product not found');
 
       expect(service.getProductById).toHaveBeenCalledWith('non-existent-id');
@@ -588,8 +629,12 @@ describe('ProductService', () => {
         description: null,
       };
 
-      vi.spyOn(service, 'getProductById').mockResolvedValue(mockExistingProduct);
-      vi.spyOn(prismaService.products, 'update').mockResolvedValue(updatedProductWithNullDescription);
+      vi.spyOn(service, 'getProductById').mockResolvedValue(
+        mockExistingProduct,
+      );
+      vi.spyOn(prismaService.products, 'update').mockResolvedValue(
+        updatedProductWithNullDescription,
+      );
 
       // Act
       const result = await service.updateProduct('product-123', updateDto);
@@ -636,9 +681,9 @@ describe('ProductService', () => {
       vi.spyOn(service, 'getProductById').mockResolvedValue(null);
 
       // Act & Assert
-      await expect(
-        service.deleteProduct('non-existent-id')
-      ).rejects.toThrow('Product not found');
+      await expect(service.deleteProduct('non-existent-id')).rejects.toThrow(
+        'Product not found',
+      );
 
       expect(service.getProductById).toHaveBeenCalledWith('non-existent-id');
       expect(prismaService.products.delete).not.toHaveBeenCalled();
@@ -648,13 +693,13 @@ describe('ProductService', () => {
       // Arrange
       vi.spyOn(service, 'getProductById').mockResolvedValue(mockProduct);
       vi.spyOn(prismaService.products, 'delete').mockRejectedValue(
-        new Error('Database constraint violation')
+        new Error('Database constraint violation'),
       );
 
       // Act & Assert
-      await expect(
-        service.deleteProduct('product-123')
-      ).rejects.toThrow('Database constraint violation');
+      await expect(service.deleteProduct('product-123')).rejects.toThrow(
+        'Database constraint violation',
+      );
 
       expect(service.getProductById).toHaveBeenCalledWith('product-123');
       expect(prismaService.products.delete).toHaveBeenCalledWith({

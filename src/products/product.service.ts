@@ -11,7 +11,7 @@ export class ProductService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly userService: UsersService,
-  ) { }
+  ) {}
 
   public async createProduct(
     dto: CreateProductDto,

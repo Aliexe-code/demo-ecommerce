@@ -47,7 +47,7 @@ describe('ProductController', () => {
         id: 'product-1',
         title: 'laptop',
         description: 'Gaming laptop',
-        price: 1500.00,
+        price: 1500.0,
         userId: 'user-1',
         user: { name: 'John Doe', email: 'john@example.com' },
         reviews: [],
@@ -102,15 +102,20 @@ describe('ProductController', () => {
   describe('createNewProduct', () => {
     it('should create a new product successfully', async () => {
       // Arrange
-      vi.spyOn(productService, 'createProduct').mockResolvedValue(mockProductResponse);
+      vi.spyOn(productService, 'createProduct').mockResolvedValue(
+        mockProductResponse,
+      );
 
       // Act
-      const result = await controller.createNewProduct(mockCreateProductDto, mockJWTPayload);
+      const result = await controller.createNewProduct(
+        mockCreateProductDto,
+        mockJWTPayload,
+      );
 
       // Assert
       expect(productService.createProduct).toHaveBeenCalledWith(
         mockCreateProductDto,
-        'user-123'
+        'user-123',
       );
       expect(result).toEqual(mockProductResponse);
     });
@@ -121,7 +126,9 @@ describe('ProductController', () => {
         id: 'different-user-id',
         email: 'different@example.com',
       };
-      vi.spyOn(productService, 'createProduct').mockResolvedValue(mockProductResponse);
+      vi.spyOn(productService, 'createProduct').mockResolvedValue(
+        mockProductResponse,
+      );
 
       // Act
       await controller.createNewProduct(mockCreateProductDto, differentPayload);
@@ -129,7 +136,7 @@ describe('ProductController', () => {
       // Assert
       expect(productService.createProduct).toHaveBeenCalledWith(
         mockCreateProductDto,
-        'different-user-id'
+        'different-user-id',
       );
     });
   });
@@ -137,7 +144,9 @@ describe('ProductController', () => {
   describe('getAllProducts', () => {
     it('should return all products without filters', async () => {
       // Arrange
-      vi.spyOn(productService, 'getAllProducts').mockResolvedValue(mockProductsResponse);
+      vi.spyOn(productService, 'getAllProducts').mockResolvedValue(
+        mockProductsResponse,
+      );
 
       // Act
       const result = await controller.getAllProducts();
@@ -146,14 +155,16 @@ describe('ProductController', () => {
       expect(productService.getAllProducts).toHaveBeenCalledWith(
         undefined,
         undefined,
-        undefined
+        undefined,
       );
       expect(result).toEqual(mockProductsResponse);
     });
 
     it('should filter products by title', async () => {
       // Arrange
-      vi.spyOn(productService, 'getAllProducts').mockResolvedValue(mockProductsResponse);
+      vi.spyOn(productService, 'getAllProducts').mockResolvedValue(
+        mockProductsResponse,
+      );
 
       // Act
       const result = await controller.getAllProducts('laptop');
@@ -162,14 +173,16 @@ describe('ProductController', () => {
       expect(productService.getAllProducts).toHaveBeenCalledWith(
         'laptop',
         undefined,
-        undefined
+        undefined,
       );
       expect(result).toEqual(mockProductsResponse);
     });
 
     it('should filter products by price range', async () => {
       // Arrange
-      vi.spyOn(productService, 'getAllProducts').mockResolvedValue(mockProductsResponse);
+      vi.spyOn(productService, 'getAllProducts').mockResolvedValue(
+        mockProductsResponse,
+      );
 
       // Act
       const result = await controller.getAllProducts(undefined, '100', '500');
@@ -178,14 +191,16 @@ describe('ProductController', () => {
       expect(productService.getAllProducts).toHaveBeenCalledWith(
         undefined,
         100,
-        500
+        500,
       );
       expect(result).toEqual(mockProductsResponse);
     });
 
     it('should handle invalid price strings gracefully', async () => {
       // Arrange
-      vi.spyOn(productService, 'getAllProducts').mockResolvedValue(mockProductsResponse);
+      vi.spyOn(productService, 'getAllProducts').mockResolvedValue(
+        mockProductsResponse,
+      );
 
       // Act
       await controller.getAllProducts(undefined, 'invalid', 'also-invalid');
@@ -194,13 +209,15 @@ describe('ProductController', () => {
       expect(productService.getAllProducts).toHaveBeenCalledWith(
         undefined,
         NaN,
-        NaN
+        NaN,
       );
     });
 
     it('should filter products by title and price range', async () => {
       // Arrange
-      vi.spyOn(productService, 'getAllProducts').mockResolvedValue(mockProductsResponse);
+      vi.spyOn(productService, 'getAllProducts').mockResolvedValue(
+        mockProductsResponse,
+      );
 
       // Act
       const result = await controller.getAllProducts('laptop', '1000', '2000');
@@ -209,7 +226,7 @@ describe('ProductController', () => {
       expect(productService.getAllProducts).toHaveBeenCalledWith(
         'laptop',
         1000,
-        2000
+        2000,
       );
       expect(result).toEqual(mockProductsResponse);
     });
@@ -231,13 +248,17 @@ describe('ProductController', () => {
     it('should handle different product IDs', async () => {
       // Arrange
       const differentProduct = { ...mockProduct, id: 'different-id' };
-      vi.spyOn(productService, 'getProductById').mockResolvedValue(differentProduct);
+      vi.spyOn(productService, 'getProductById').mockResolvedValue(
+        differentProduct,
+      );
 
       // Act
       const result = await controller.getProductById({ id: 'different-id' });
 
       // Assert
-      expect(productService.getProductById).toHaveBeenCalledWith('different-id');
+      expect(productService.getProductById).toHaveBeenCalledWith(
+        'different-id',
+      );
       expect(result).toEqual(differentProduct);
     });
 
@@ -249,7 +270,9 @@ describe('ProductController', () => {
       const result = await controller.getProductById({ id: 'non-existent-id' });
 
       // Assert
-      expect(productService.getProductById).toHaveBeenCalledWith('non-existent-id');
+      expect(productService.getProductById).toHaveBeenCalledWith(
+        'non-existent-id',
+      );
       expect(result).toBeNull();
     });
   });
@@ -268,15 +291,20 @@ describe('ProductController', () => {
 
     it('should update a product successfully', async () => {
       // Arrange
-      vi.spyOn(productService, 'updateProduct').mockResolvedValue(mockUpdateResponse);
+      vi.spyOn(productService, 'updateProduct').mockResolvedValue(
+        mockUpdateResponse,
+      );
 
       // Act
-      const result = await controller.updateProduct('product-123', mockUpdateProductDto);
+      const result = await controller.updateProduct(
+        'product-123',
+        mockUpdateProductDto,
+      );
 
       // Assert
       expect(productService.updateProduct).toHaveBeenCalledWith(
         'product-123',
-        mockUpdateProductDto
+        mockUpdateProductDto,
       );
       expect(result).toEqual(mockUpdateResponse);
     });
@@ -284,30 +312,40 @@ describe('ProductController', () => {
     it('should handle partial updates', async () => {
       // Arrange
       const partialUpdateDto = { title: 'Only title updated' };
-      vi.spyOn(productService, 'updateProduct').mockResolvedValue(mockUpdateResponse);
+      vi.spyOn(productService, 'updateProduct').mockResolvedValue(
+        mockUpdateResponse,
+      );
 
       // Act
-      const result = await controller.updateProduct('product-123', partialUpdateDto);
+      const result = await controller.updateProduct(
+        'product-123',
+        partialUpdateDto,
+      );
 
       // Assert
       expect(productService.updateProduct).toHaveBeenCalledWith(
         'product-123',
-        partialUpdateDto
+        partialUpdateDto,
       );
       expect(result).toEqual(mockUpdateResponse);
     });
 
     it('should handle different product IDs', async () => {
       // Arrange
-      vi.spyOn(productService, 'updateProduct').mockResolvedValue(mockUpdateResponse);
+      vi.spyOn(productService, 'updateProduct').mockResolvedValue(
+        mockUpdateResponse,
+      );
 
       // Act
-      await controller.updateProduct('different-product-id', mockUpdateProductDto);
+      await controller.updateProduct(
+        'different-product-id',
+        mockUpdateProductDto,
+      );
 
       // Assert
       expect(productService.updateProduct).toHaveBeenCalledWith(
         'different-product-id',
-        mockUpdateProductDto
+        mockUpdateProductDto,
       );
     });
   });
@@ -319,7 +357,9 @@ describe('ProductController', () => {
 
     it('should delete a product successfully', async () => {
       // Arrange
-      vi.spyOn(productService, 'deleteProduct').mockResolvedValue(mockDeleteResponse);
+      vi.spyOn(productService, 'deleteProduct').mockResolvedValue(
+        mockDeleteResponse,
+      );
 
       // Act
       const result = await controller.deleteProduct('product-123');
@@ -331,13 +371,17 @@ describe('ProductController', () => {
 
     it('should handle different product IDs', async () => {
       // Arrange
-      vi.spyOn(productService, 'deleteProduct').mockResolvedValue(mockDeleteResponse);
+      vi.spyOn(productService, 'deleteProduct').mockResolvedValue(
+        mockDeleteResponse,
+      );
 
       // Act
       const result = await controller.deleteProduct('different-product-id');
 
       // Assert
-      expect(productService.deleteProduct).toHaveBeenCalledWith('different-product-id');
+      expect(productService.deleteProduct).toHaveBeenCalledWith(
+        'different-product-id',
+      );
       expect(result).toEqual(mockDeleteResponse);
     });
   });
