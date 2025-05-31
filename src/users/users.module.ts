@@ -6,7 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from './guards/auth.guard';
 import { AuthProvider } from './auth.provider';
-import { MailModule } from '@/mail/mail.module';
+import { MailModule } from '../mail/mail.module';
 @Module({
   imports: [
     MailModule,

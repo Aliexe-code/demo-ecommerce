@@ -9,7 +9,7 @@ import {
 import { CreateReviewDto } from './dtos/create-review.dto';
 import { Review, UserType } from '@prisma/client';
 import { UpdateReviewDto } from './dtos/update-review.dto';
-import { JWTPayloadType } from '@/users/entities';
+import { JWTPayloadType } from '../users/entities';
 import { PaginationDto } from './dtos/pagination-review.dto';
 
 @Injectable()

@@ -209,60 +209,10 @@ export class UsersService {
   }
 
   public async resetPassword(email: string, code: string, password: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      throw new NotFoundException('User not found.');
-    }
-
-    if (!user.resetPasswordToken) {
-      throw new BadRequestException('Invalid or expired verification code.');
-    }
-
-    if (user.resetPasswordToken !== code) {
-      throw new BadRequestException('Invalid verification code.');
-    }
-
-    const hashedPassword = await this.authProvider.hashPassword(password);
-
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: {
-        password: hashedPassword,
-        resetPasswordToken: null, // Clear the code after password reset
-      },
-    });
-
-    return { message: 'Password has been reset successfully.' };
+    return this.authProvider.resetPassword(email, code, password);
   }
 
   public async verifyEmail(userId: string, verificationToken: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      throw new NotFoundException('User not found.');
-    }
-
-    if (user.emailVerified) {
-      throw new BadRequestException('Email is already verified.');
-    }
-
-    if (user.verificationToken !== verificationToken) {
-      throw new BadRequestException('Invalid verification token.');
-    }
-
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        emailVerified: true,
-        verificationToken: null, // Clear the token after verification
-      },
-    });
-
-    return { message: 'Email verified successfully.' };
+    return this.authProvider.verifyEmail(userId, verificationToken);
   }
 }

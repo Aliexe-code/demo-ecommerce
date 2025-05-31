@@ -2,6 +2,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
@@ -9,7 +10,7 @@ import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import type { JWTPayloadType, Response } from './entities/types';
 import { LoginDto } from './dto/login.dto';
-import { MailService } from '@/mail/mail.service';
+import { MailService } from '../mail/mail.service';
 import { randomBytes } from 'node:crypto';
 import { ConfigService } from '@nestjs/config';
 @Injectable()
@@ -109,12 +110,73 @@ export class AuthProvider {
       throw new BadRequestException('Failed to send reset password email');
     }
   }
+
+  public async verifyEmail(userId: string, verificationToken: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+
+    if (user.emailVerified) {
+      throw new BadRequestException('Email is already verified.');
+    }
+
+    if (user.verificationToken !== verificationToken) {
+      throw new BadRequestException('Invalid verification token.');
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        emailVerified: true,
+        verificationToken: null, // Clear the token after verification
+      },
+    });
+
+    return { message: 'Email verified successfully.' };
+  }
+
+  public async resetPassword(email: string, code: string, newPassword: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+
+    if (!user.resetPasswordToken) {
+      throw new BadRequestException('Invalid or expired verification code.');
+    }
+
+    if (user.resetPasswordToken !== code) {
+      throw new BadRequestException('Invalid verification code.');
+    }
+
+    const hashedPassword = await this.hashPassword(newPassword);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetPasswordToken: null, // Clear the code after password reset
+      },
+    });
+
+    return { message: 'Password has been reset successfully.' };
+  }
+
   public async hashPassword(password: string): Promise<string> {
     return await argon2.hash(password);
   }
+
   private generateJWT(payload: JWTPayloadType): Promise<string> {
     return this.jwtService.signAsync(payload);
   }
+
   private generateLink(userId: string, verificationToken: string): string {
     return `${this.config.get<string>('DOMAIN')}/api/users/verify-email/${userId}/${verificationToken}`;
   }
