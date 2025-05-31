@@ -15,3 +15,6 @@ docker build -t demo-ecommerce .
 
 # Run the Container with the .env File Mounted
 docker run --env-file .env -p 3000:3000 demo-ecommerce
+
+# Run docker no deatials
+docker run -d --env-file .env -p 3000:3000 demo-ecommerce
