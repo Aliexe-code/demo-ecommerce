@@ -11,11 +11,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
-import { AuthRolesGuard } from '@/users/guards/auth-roles.guard';
+import { AuthRolesGuard } from '../users/guards/auth-roles.guard';
 import { UserType } from '@prisma/client';
 import { CreateReviewDto } from './dtos/create-review.dto';
-import type { JWTPayloadType } from '@/users/entities';
-import { Roles } from '@/users/decorators/role-user.decorators';
+import type { JWTPayloadType } from '../users/entities';
+import { Roles } from '../users/decorators/role-user.decorators';
 import { UpdateReviewDto } from './dtos/update-review.dto';
 import { PaginationDto } from './dtos/pagination-review.dto';
 @Controller('api/reviews')

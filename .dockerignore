@@ -1,0 +1,48 @@
+# Git
+.git
+.github
+.gitignore
+
+# Node.js / Bun
+node_modules
+npm-debug.log
+bun-debug.log
+
+# Build outputs
+dist
+build
+.swc
+*.tsbuildinfo
+
+# Environment and config
+.env
+.env.*
+!.env.example
+
+# IDE and editors
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Tests
+test
+coverage
+*.spec.ts
+*.test.ts
+vitest.config.ts
+vitest.config.e2e.ts
+
+# Misc
+.DS_Store
+Thumbs.db
+*.md
+README.md
+LICENSE
+.prettierrc
+.eslintrc
+.eslintignore
+.editorconfig

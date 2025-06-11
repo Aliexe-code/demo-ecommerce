@@ -4,10 +4,10 @@ import { UsersModule } from '../users/users.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { HealthController } from './health.controller';
-import { ProductModule } from '@/products/product.module';
-import { ReviewsModule } from '@/reviews/reviews.module';
-import { UploadsModule } from '@/uploads/uploads.module';
-import { MailModule } from '@/mail/mail.module';
+import { ProductModule } from '../products/product.module';
+import { ReviewsModule } from '../reviews/reviews.module';
+import { UploadsModule } from '../uploads/uploads.module';
+import { MailModule } from '../mail/mail.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
