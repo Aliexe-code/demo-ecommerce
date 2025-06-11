@@ -45,7 +45,9 @@ export class AuthRolesGuard implements CanActivate {
 
         if (roles.includes(user.userData.userType)) {
           request['user'] = payload;
+          return true;
         }
+        return false;
       } catch (error) {
         console.error('Error verifying JWT:', error);
         throw new UnauthorizedException('Invalid token');
@@ -53,6 +55,5 @@ export class AuthRolesGuard implements CanActivate {
     } else {
       throw new UnauthorizedException('No token provided');
     }
-    return true;
   }
 }
